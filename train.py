@@ -44,39 +44,11 @@ def main():
     torch.backends.cudnn.deterministic = True
 
 
-    try:
-        with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/uk_jobs.pkl', 'rb') as file:
-            dicts = pickle.load(file)
-    except:
-        print('No Job Ad dataset')
-    uk_jobs = pd.DataFrame(dicts).reset_index()
-    uk_jobs = uk_jobs.drop('index', axis=1)
-
-
     with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/train_samples.pkl', 'rb') as file:
         train_samples = pickle.load(file)
 
     with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/dev_samples.pkl', 'rb') as file:
         dev_samples = pickle.load(file)
-
-    #gender_words = ['mr','his','he','him','himself','mrs','hers','she','her','herself','Alice', 'Bob']
-    #if base_args.anonymous:
-    #    anonymous_bios = []
-    #    for i in range(len(bios_train['bio'])):
-    #        bio_string = bios_train['bio'][i]
-    #        for i in range(len(gender_words)):
-    #            bio_string = re.sub(gender_words[i], '_',bio_string,flags=re.I)
-    #        anonymous_bios.append(bio_string)
-
-    #    bios_train['bio'] == anonymous_bios
-    #    anonymous_bios = []
-    #    for i in range(len(bios_val['bio'])):
-    #       bio_string = bios_val['bio'][i]
-    #        for i in range(len(gender_words)):
-    #            bio_string = re.sub(gender_words[i], '_',bio_string,flags=re.I)
-    #        anonymous_bios.append(bio_string)
-
-    #    bios_val['bio'] == anonymous_bios
 
     model = CrossEncoder(model_name, num_labels=1, device=device)
 

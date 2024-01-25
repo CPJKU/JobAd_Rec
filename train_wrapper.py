@@ -7,13 +7,6 @@ MODEL_NAME = 'distilroberta-base' #'bert-base-uncased' 'distilroberta-base'
 #CMD_IDX =  [0,1,..]
 seed = [1500, 1390, 5915]
 
-#for i in range(N):
-#    cmds = {
-#        1: f"python3 train.py --gpu_id={GPU_ID} --seed={seed[i]} --model={MODEL_NAME}"
-
-#    }
-#    for j in CMD_IDX:
-#        subprocess.call(cmds[j], shell=True)
 
 
 def run_script(script_name):
