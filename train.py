@@ -33,7 +33,7 @@ def main():
     #    condition = "KNO"  
     #train_batch_size = 64
     num_epochs = 4
-    model_save_path = '/home/deepak/JobAd_Rec/Models/'+model_name+'_'+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    model_save_path = '/home/deepak/JobAd_Rec/Models/'+str(base_args.seed)+'_'+model_name+'_'+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     #pos_neg_ration = 4
     print(f"manual_seed({base_args.seed})")
@@ -53,10 +53,10 @@ def main():
     uk_jobs = uk_jobs.drop('index', axis=1)
 
 
-    with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/train.pkl', 'rb') as file:
+    with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/train_samples.pkl', 'rb') as file:
         train_samples = pickle.load(file)
 
-    with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/val.pkl', 'rb') as file:
+    with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/dev_samples.pkl', 'rb') as file:
         dev_samples = pickle.load(file)
 
     #gender_words = ['mr','his','he','him','himself','mrs','hers','she','her','herself','Alice', 'Bob']
