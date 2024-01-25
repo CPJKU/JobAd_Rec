@@ -98,7 +98,6 @@ def main():
     model.fit(train_dataloader=train_dataloader,
             evaluator=evaluator,
             epochs=num_epochs,
-            evaluation_steps=5904,
             warmup_steps=warmup_steps,
             output_path=model_save_path,
             save_best_model= True,
