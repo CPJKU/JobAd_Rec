@@ -22,7 +22,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--gpu_id", type=int, default=0, help="gpu no.")
     parser.add_argument("--seed", type=int, default=0, help="torch random seed")
-    parser.add_argument("--model", type=str, default="bert--uncased", help="model name")
+    parser.add_argument("--model", type=str, default="bert-base-uncased", help="model name")
+    parser.add_argument("--local", default=False, action='store_true', help="changes path suitable to run locally")
+    parser.add_argument("--debias", type=str, default=None, help="select from debias methods "
+                                                                 "'reg' for regularization  "
+                                                                 "'adv' for adversarial")
     #parser.add_argument("--balance", type=str, default="balanced", help="the gender distribution in training data is skewed towards")
     #parser.add_argument("--anonymous", default=False, action='store_true', help="remove gender from candidate text")
     base_args, _ = parser.parse_known_args()
@@ -34,8 +38,9 @@ def main():
     #else:
     #    condition = "KNO"  
     #train_batch_size = 64
+    pth = "/home/shahed/" if base_args.local==True else "/"
     num_epochs = 4
-    model_save_path = '/home/deepak/JobAd_Rec/Models/'+str(base_args.seed)+'_'+model_name+'_'+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    model_save_path = f'./Models/'+str(base_args.seed)+'_'+model_name+'_'+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     #pos_neg_ration = 4
     print(f"manual_seed({base_args.seed})")
@@ -46,10 +51,10 @@ def main():
     torch.backends.cudnn.deterministic = True
 
 
-    with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/train_samples.pkl', 'rb') as file:
+    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/train_samples.pkl', 'rb') as file:
         train_samples = pickle.load(file)
 
-    with open( '/share/hel/datasets/jobiqo/talent.com/JobRec/dev_samples.pkl', 'rb') as file:
+    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/dev_samples.pkl', 'rb') as file:
         dev_samples = pickle.load(file)
 
     model = CrossEncoder(model_name, num_labels=1, device=device)
@@ -75,11 +80,11 @@ def main():
             warmup_steps=warmup_steps,
             output_path=model_save_path,
             save_best_model= True,
-            debias=False, #remove this if using orininal sentence-transformer libaray
+            debias=base_args.debias, #remove this if using orininal sentence-transformer libaray
             use_amp=True)
 
     #Test latest model
-    testing(path=model_save_path,device=device)
+    testing(path=model_save_path,device=device, pth=pth)
 
 if __name__ == "__main__":
 
