@@ -101,7 +101,7 @@ def main():
             warmup_steps=warmup_steps,
             output_path=model_save_path,
             save_best_model= True,
-            debias=False,
+            debias=False, #remove this if using orininal sentence-transformer libaray
             use_amp=True)
 
     #Save latest model
