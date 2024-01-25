@@ -14,6 +14,8 @@ from datetime import datetime
 import torch
 import regex as re
 from tqdm.autonotebook import tqdm
+from testing import testing
+
 
 def main():
 
@@ -76,8 +78,8 @@ def main():
             debias=False, #remove this if using orininal sentence-transformer libaray
             use_amp=True)
 
-    #Save latest model
-    #model.save(model_save_path+'-latest')
+    #Test latest model
+    testing(path=model_save_path,device=device)
 
 if __name__ == "__main__":
 
