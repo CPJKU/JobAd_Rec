@@ -4,7 +4,6 @@ import threading
 GPU_ID = [2,3,4]
 N = 1
 MODEL_NAME = 'distilroberta-base' #'bert-base-uncased' 'distilroberta-base'
-#CMD_IDX =  [0,1,..]
 seed = [1500, 1390, 5915]
 
 
