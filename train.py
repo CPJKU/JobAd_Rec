@@ -7,7 +7,7 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from sentence_transformers import LoggingHandler
 from sentence_transformers.cross_encoder import CrossEncoder
-from sentence_transformers.cross_encoder.evaluation import CERerankingEvaluator
+from sentence_transformers.cross_encoder.evaluation import CERerankingEvalUpdated
 from sentence_transformers import InputExample
 import logging
 from datetime import datetime
@@ -89,7 +89,7 @@ def main():
         wandb_logger = None
     train_dataloader = DataLoader(train_samples, shuffle=True, batch_size=base_args.batch_size)
 
-    evaluator = CERerankingEvaluator(dev_samples, name='train-eval')
+    evaluator = CERerankingEvalUpdated(dev_samples, name='train-eval')
 
     logging.basicConfig(format='%(asctime)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S',
