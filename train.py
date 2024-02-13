@@ -56,8 +56,8 @@ def main():
 
     config = vars(base_args)
     config["model_save_path"] = model_save_path
-    config["train_path"] = f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/train_samples.pkl'
-    config["dev_path"] = f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/dev_samples.pkl'
+    config["train_path"] = f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_train_samples.pkl'
+    config["dev_path"] = f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_dev_samples.pkl'
 
     #pos_neg_ration = 4
     print(f"manual_seed({base_args.seed})")
@@ -68,10 +68,10 @@ def main():
     torch.backends.cudnn.deterministic = True
 
 
-    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/train_samples.pkl', 'rb') as file:
+    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_train_samples.pkl', 'rb') as file:
         train_samples = pickle.load(file)
 
-    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/dev_samples.pkl', 'rb') as file:
+    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_dev_samples.pkl', 'rb') as file:
         dev_samples = pickle.load(file)
 
 

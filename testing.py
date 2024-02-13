@@ -28,11 +28,11 @@ def testing(path,
             mask_token='[MASK]'
         uk_jobs['description'] = uk_jobs['description'].apply(lambda x:  replace_words.sub(mask_token,x))
 
-    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/test.pkl', 'rb') as file:
+    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_test.pkl', 'rb') as file:
         dicts = pickle.load(file)
     bios_test = pd.DataFrame(dicts)
 
-    test_hits = pd.read_csv(f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/BM25/test_hits.txt', sep=' ', header=None, names=['query_id', 'Q0', 'doc_id', 'rank', 'score','Anserini'])
+    test_hits = pd.read_csv(f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/BM25/unbalanced_test_hits.txt', sep=' ', header=None, names=['query_id', 'Q0', 'doc_id', 'rank', 'score','Anserini'])
     test_hits = test_hits.drop(['Q0','rank','score','Anserini'], axis='columns')
     test_hits['doc_id'] = test_hits['doc_id'].replace('doc','',regex=True).astype(int)
 
