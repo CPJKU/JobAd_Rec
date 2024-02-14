@@ -2,18 +2,18 @@
 import argparse
 
 import pickle
-import pandas as pd
+# import pandas as pd
 
 from torch.utils.data import DataLoader
 from sentence_transformers import LoggingHandler
 from sentence_transformers.cross_encoder import CrossEncoder
 from sentence_transformers.cross_encoder.evaluation import CERerankingEvalUpdated
-from sentence_transformers import InputExample
+# from sentence_transformers import InputExample
 import logging
 from datetime import datetime
 import torch
-import regex as re
-from tqdm.autonotebook import tqdm
+# import regex as re
+# from tqdm.autonotebook import tqdm
 from testing import testing
 import wandb
 import os
@@ -37,7 +37,7 @@ def main():
     parser.add_argument("--lmbda", type=float, default=0., help="Regularization Strength")
 
     parser.add_argument("--wandb", default=False, action='store_true', help="Logs on Wandb")
-    parser.add_argument("--project_name", type=str, default="JAR", help="Wandb project name")
+    parser.add_argument("--project_name", type=str, default="unbalanced_JAR", help="Wandb project name")
     parser.add_argument("--exp_name", type=str, default=None, help="Experiment Name")
     #parser.add_argument("--balance", type=str, default="balanced", help="the gender distribution in training data is skewed towards")
     #parser.add_argument("--anonymous", default=False, action='store_true', help="remove gender from candidate text")
@@ -89,7 +89,7 @@ def main():
         wandb_logger = None
     train_dataloader = DataLoader(train_samples, shuffle=True, batch_size=base_args.batch_size)
 
-    evaluator = CERerankingEvalUpdated(dev_samples, name='train-eval')
+    evaluator = CERerankingEvalUpdated(dev_samples, name='train-eval',lmbda=base_args.lmbda)
 
     logging.basicConfig(format='%(asctime)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S',

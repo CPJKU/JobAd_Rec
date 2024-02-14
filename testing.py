@@ -71,7 +71,7 @@ def testing(path,
 
     wandb_logger.log({"Final test NDCG10": sum(ndcg_list)/len(ndcg_list),
                       "Final test male NDCG10": avg_male_ndcg,
-                      "Final test female": avg_female_ndcg,
+                      "Final test female NDCG10": avg_female_ndcg,
                       "Final test GAP": gap})
     if masked:
         with open(path+'mask_result.pkl', 'wb') as f:
