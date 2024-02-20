@@ -1,12 +1,12 @@
 import subprocess
 import threading
 
-GPU_ID = [5,6,7]
+GPU_ID = [2,3,4]
 N = 1
 MODEL_NAME = 'distilroberta-base' #'bert-base-uncased' 'distilroberta-base'
-project_name = 'unbalanced_JAR2'
+project_name = 'unbalanced_JAR3'
 seed = [1500, 1390, 5915]
-lmbda = [0.1, 0.3] #[0.2, 0.4, 0.6, 0.8, 1.0] #[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+lmbda = [0.0, 0.2, 0.4] #[0.0, 0.2, 0.4] #[0.6, 0.8, 1.0]
 db = ["reg"]
 
 

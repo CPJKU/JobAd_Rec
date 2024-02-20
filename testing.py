@@ -69,7 +69,7 @@ def testing(path,
                               "test Male_NDCG@10": avg_male_ndcg,
                               "test Female_NDCG@10": avg_female_ndcg,
                               "test NDCG@10 Gap": gap,
-                              "test neutrality@10": neutrality_score
+                              "test neutrality@10": neutrality
                               },)
 
         result.append(dicts)
