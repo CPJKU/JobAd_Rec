@@ -42,6 +42,7 @@ def testing(path,
     ndcg_list = []
     male_ndcg_list = []
     female_ndcg_list = []
+    neutrality_score = []
     for id in tqdm(range(len(bios_test))):
         new_uk_jobs = uk_jobs.loc[test_hits[test_hits['query_id']==id]['doc_id']-1]
         query = bios_test['bio'][id]
@@ -58,13 +59,17 @@ def testing(path,
         avg_male_ndcg  = sum(male_ndcg_list)/len(male_ndcg_list) if len(male_ndcg_list) > 0  else 0
         avg_female_ndcg = sum(female_ndcg_list) / len(female_ndcg_list) if len(female_ndcg_list) > 0  else 0
         gap = np.abs(avg_male_ndcg - avg_female_ndcg)
+        neutrality = uk_jobs.iloc[dicts['corpus_id'][:10]]['neutrality'].mean()
+        neutrality_score.append(neutrality)
+
         if wandb_logger is not None:
             wandb_logger.log({"test_data_percentage":id/(len(bios_test)-1)*100,
                               "test ndcg10_step":ndcg_,
                               "test NDCG@10": sum(ndcg_list)/len(ndcg_list),
                               "test Male_NDCG@10": avg_male_ndcg,
                               "test Female_NDCG@10": avg_female_ndcg,
-                              "test NDCG@10 Gap": gap
+                              "test NDCG@10 Gap": gap,
+                              "test neutrality@10": neutrality_score
                               },)
 
         result.append(dicts)
@@ -72,7 +77,8 @@ def testing(path,
     wandb_logger.log({"Final test NDCG10": sum(ndcg_list)/len(ndcg_list),
                       "Final test male NDCG10": avg_male_ndcg,
                       "Final test female NDCG10": avg_female_ndcg,
-                      "Final test GAP": gap})
+                      "Final test GAP": gap,
+                      "Final test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
     if masked:
         with open(path+'mask_result.pkl', 'wb') as f:
             pickle.dump(result, f)    

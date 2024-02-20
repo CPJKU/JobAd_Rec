@@ -106,12 +106,13 @@ def main():
             epochs=base_args.num_epochs,
             warmup_steps=base_args.warmup_steps,
             output_path=model_save_path,
-            save_best_model= True,
+            save_best_model= False,
             debias=base_args.debias, #remove this if using orininal sentence-transformer libaray
             lmbda=base_args.lmbda,
             use_amp=True,
             wandb_logger= wandb_logger
               )
+    model.save(model_save_path)
 
     #Test latest model
     testing(path=model_save_path,
