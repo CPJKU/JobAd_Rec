@@ -134,7 +134,7 @@ def main():
                 dicts=pickle.load(file1)
                 dicts_counter = pickle.load(file2)
                 wandb_logger.log({"Final test LDR10": LDR(pth,dicts,dicts_counter),
-                                  "Final test counterfactual GAP": get_counterfactual_gap(dicts,dicts_counter)})
+                                  "Final test counterfactual GAP": get_counterfactual_gap(pth,dicts,dicts_counter)})
         
 if __name__ == "__main__":
 

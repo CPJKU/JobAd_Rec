@@ -1,6 +1,7 @@
 from sklearn.metrics import ndcg_score
 import numpy as np
 import pandas as pd
+import pickle
 
 
 
@@ -32,7 +33,11 @@ def get_gap(uk_jobs, bios_test,dicts):
     return abs(np.mean(np.array(male_ndcg))-np.mean(np.array(female_ndcg)))
 
 
-def get_counterfactual_gap(uk_jobs,bios_test,dicts,dicts_counter):
+def get_counterfactual_gap(pth,bios_test,dicts,dicts_counter):
+    with open(f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/uk_jobs.pkl', 'rb') as file:
+        dicts = pickle.load(file)
+    uk_jobs = pd.DataFrame(dicts).reset_index()
+    uk_jobs = uk_jobs.drop('index', axis=1)
     ndcg = []
     ndcg_counter = []
     for i in range(len(bios_test)):
