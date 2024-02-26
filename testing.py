@@ -1,17 +1,22 @@
 import pickle
+import torch
 import pandas as pd
 from sentence_transformers.cross_encoder import CrossEncoder
 import re
 from tqdm.autonotebook import tqdm
 import numpy as np
-from sklearn.metrics import ndcg_score
+#from sklearn.metrics import ndcg_score
+from metrics import get_ndcg,SDR
 
 def testing(path,
-            device,
-            pth,
+            gpu,
+            pth= '/',
             masked=False,
+            counterfactual=False,
             wandb_logger=None):
 
+    device = torch.device(f"cuda:{int(gpu)}")
+    
     with open(f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/uk_jobs.pkl', 'rb') as file:
         dicts = pickle.load(file)
     uk_jobs = pd.DataFrame(dicts).reset_index()
@@ -31,6 +36,9 @@ def testing(path,
     with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_test.pkl', 'rb') as file:
         dicts = pickle.load(file)
     bios_test = pd.DataFrame(dicts)
+
+    if counterfactual:
+        bios_test['bio']=bios_test['counter_bio']
 
     test_hits = pd.read_csv(f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/BM25/unbalanced_test_hits.txt', sep=' ', header=None, names=['query_id', 'Q0', 'doc_id', 'rank', 'score','Anserini'])
     test_hits = test_hits.drop(['Q0','rank','score','Anserini'], axis='columns')
@@ -73,23 +81,47 @@ def testing(path,
                               },)
 
         result.append(dicts)
+    
+    sdr = SDR(bios_test,result)
 
-    wandb_logger.log({"Final test NDCG10": sum(ndcg_list)/len(ndcg_list),
-                      "Final test male NDCG10": avg_male_ndcg,
-                      "Final test female NDCG10": avg_female_ndcg,
-                      "Final test GAP": gap,
-                      "Final test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
-    if masked:
-        with open(path+'mask_result.pkl', 'wb') as f:
-            pickle.dump(result, f)    
-    else:
-        with open(path+'shahed_result.pkl', 'wb') as f:
+    #if wandb_logger is not None:
+    #    wandb_logger.log({"Final test NDCG10": sum(ndcg_list)/len(ndcg_list),
+    #                    "Final test male NDCG10": avg_male_ndcg,
+    #                    "Final test female NDCG10": avg_female_ndcg,
+    #                    "Final test GAP": gap,
+    #                    "Final test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
+    if counterfactual:
+        if wandb_logger is not None:
+            wandb_logger.log({"Final counterfactual test NDCG10": sum(ndcg_list)/len(ndcg_list),
+                            "Final counterfactual test male NDCG10": avg_male_ndcg,
+                            "Final counterfactual test female NDCG10": avg_female_ndcg,
+                            "Final counterfactual test GAP": gap,
+                            "Final counterfactual test SDR": sdr,
+                            "Final counterfactual test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
+
+        with open(path+'counter_result.pkl', 'wb') as f:
             pickle.dump(result, f)
+    else:
+        if wandb_logger is not None:
+            wandb_logger.log({"Final test NDCG10": sum(ndcg_list)/len(ndcg_list),
+                            "Final test male NDCG10": avg_male_ndcg,
+                            "Final test female NDCG10": avg_female_ndcg,
+                            "Final test GAP": gap,
+                            "Final test SDR": sdr,
+                            "Final test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
+
+        if masked:
+            with open(path+'mask_result.pkl', 'wb') as f:
+                pickle.dump(result, f)    
+        else:
+            with open(path+'shahed_result.pkl', 'wb') as f:
+                pickle.dump(result, f)
 
 
-def get_ndcg(uk_jobs, bios_test, id, dicts):
-    ndcg = ndcg_score(np.asarray(
-        [uk_jobs.iloc[dicts['corpus_id']]['title'].apply(lambda x: 1 if x == bios_test['raw_title'][id] else 0)]),
-        [dicts['scores']], k=10)
-    return ndcg
+#def get_ndcg(uk_jobs, bios_test, id, dicts):
+#    ndcg = ndcg_score(np.asarray(
+#        [uk_jobs.iloc[dicts['corpus_id']]['title'].apply(lambda x: 1 if x == bios_test['raw_title'][id] else 0)]),
+#        [dicts['scores']], k=10)
+#    return ndcg
+
 

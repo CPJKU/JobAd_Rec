@@ -15,6 +15,8 @@ import torch
 # import regex as re
 # from tqdm.autonotebook import tqdm
 from testing import testing
+from metrics import get_counterfactual_gap,LDR
+
 import wandb
 import os
 
@@ -116,10 +118,24 @@ def main():
 
     #Test latest model
     testing(path=model_save_path,
-            device=device,
+            gpu=base_args.gpu_id,
             pth=pth,
             wandb_logger=wandb_logger)
+    #Test latest model on counterfactuals
+    testing(path=model_save_path,
+            gpu=base_args.gpu_id,
+            pth=pth,
+            counterfactual=True,
+            wandb_logger=wandb_logger)
 
+    if wandb_logger is not None:
+        with open( model_save_path+'shahed_result.pkl','rb') as file1:
+            with open( model_save_path+'counter_result.pkl','rb') as file2:
+                dicts=pickle.load(file1)
+                dicts_counter = pickle.load(file2)
+                wandb_logger.log({"Final test LDR10": LDR(dicts,dicts_counter),
+                                  "Final test counterfactual GAP": get_counterfactual_gap(dicts,dicts_counter)})
+        
 if __name__ == "__main__":
 
     main()
