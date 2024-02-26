@@ -62,7 +62,10 @@ def SDR(bios_test,dicts):
     #output = len(set(male_item_ids).intersection(female_item_ids))
     return output
 
-def LDR(bios_test,dicts,dicts_counter):
+def LDR(pth,dicts,dicts_counter):
+    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_test.pkl', 'rb') as file:
+        dicts = pickle.load(file)
+    bios_test = pd.DataFrame(dicts)
     output = []
     
     for i in range(len(bios_test)):
