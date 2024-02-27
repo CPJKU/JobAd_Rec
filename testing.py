@@ -14,7 +14,7 @@ def testing(path,
             masked=False,
             counterfactual=False,
             wandb_logger=None):
-
+    prename = 'cf' if counterfactual else ''
     device = torch.device(f"cuda:{int(gpu)}")
     
     with open(f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/uk_jobs.pkl', 'rb') as file:
@@ -55,6 +55,7 @@ def testing(path,
         new_uk_jobs = uk_jobs.loc[test_hits[test_hits['query_id']==id]['doc_id']-1]
         query = bios_test['bio'][id]
         sentence_combinations = [[query,hit] for hit in new_uk_jobs['description']]
+
         cross_scores = model.predict(sentence_combinations)
         dicts = {'corpus_id': new_uk_jobs.index[np.flip(np.argsort(cross_scores))],
                        'scores':sorted(cross_scores, reverse=True)}
@@ -71,13 +72,13 @@ def testing(path,
         neutrality_score.append(neutrality)
 
         if wandb_logger is not None:
-            wandb_logger.log({"test_data_percentage":id/(len(bios_test)-1)*100,
-                              "test ndcg10_step":ndcg_,
-                              "test NDCG@10": sum(ndcg_list)/len(ndcg_list),
-                              "test Male_NDCG@10": avg_male_ndcg,
-                              "test Female_NDCG@10": avg_female_ndcg,
-                              "test NDCG@10 Gap": gap,
-                              "test neutrality@10": neutrality
+            wandb_logger.log({f"{prename} test_data_percentage":id/(len(bios_test)-1)*100,
+                              f"{prename} test ndcg10_step":ndcg_,
+                              f"{prename} test NDCG@10": sum(ndcg_list)/len(ndcg_list),
+                              f"{prename} test Male_NDCG@10": avg_male_ndcg,
+                              f"{prename} test Female_NDCG@10": avg_female_ndcg,
+                              f"{prename} test NDCG@10 Gap": gap,
+                              f"{prename} test neutrality@10": np.mean(neutrality_score)
                               },)
 
         result.append(dicts)
@@ -90,32 +91,21 @@ def testing(path,
     #                    "Final test female NDCG10": avg_female_ndcg,
     #                    "Final test GAP": gap,
     #                    "Final test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
-    if counterfactual:
-        if wandb_logger is not None:
-            wandb_logger.log({"Final counterfactual test NDCG10": sum(ndcg_list)/len(ndcg_list),
-                            "Final counterfactual test male NDCG10": avg_male_ndcg,
-                            "Final counterfactual test female NDCG10": avg_female_ndcg,
-                            "Final counterfactual test GAP": gap,
-                            "Final counterfactual test SDR": sdr,
-                            "Final counterfactual test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
 
-        with open(path+'counter_result.pkl', 'wb') as f:
+    if wandb_logger is not None:
+        wandb_logger.log({f"{prename} Final test NDCG10": sum(ndcg_list)/len(ndcg_list),
+                        f"{prename} Final test male NDCG10": avg_male_ndcg,
+                        f"{prename} Final test female NDCG10": avg_female_ndcg,
+                        f"{prename} Final test GAP": gap,
+                        f"{prename} Final test SDR": sdr,
+                        f"{prename} Final test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
+
+    if masked:
+        with open(path+'mask_result.pkl', 'wb') as f:
             pickle.dump(result, f)
     else:
-        if wandb_logger is not None:
-            wandb_logger.log({"Final test NDCG10": sum(ndcg_list)/len(ndcg_list),
-                            "Final test male NDCG10": avg_male_ndcg,
-                            "Final test female NDCG10": avg_female_ndcg,
-                            "Final test GAP": gap,
-                            "Final test SDR": sdr,
-                            "Final test neutrality@10":sum(neutrality_score)/len(neutrality_score)})
-
-        if masked:
-            with open(path+'mask_result.pkl', 'wb') as f:
-                pickle.dump(result, f)    
-        else:
-            with open(path+'shahed_result.pkl', 'wb') as f:
-                pickle.dump(result, f)
+        with open(path+f'{"shahed" if not counterfactual else "counter"}_result.pkl', 'wb') as f:
+            pickle.dump(result, f)
 
 
 #def get_ndcg(uk_jobs, bios_test, id, dicts):

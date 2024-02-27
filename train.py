@@ -39,7 +39,7 @@ def main():
     parser.add_argument("--lmbda", type=float, default=0., help="Regularization Strength")
 
     parser.add_argument("--wandb", default=False, action='store_true', help="Logs on Wandb")
-    parser.add_argument("--project_name", type=str, default="unbalanced_JAR", help="Wandb project name")
+    parser.add_argument("--project_name", type=str, default="unbalanced_sigmoid_JAR", help="Wandb project name")
     parser.add_argument("--exp_name", type=str, default=None, help="Experiment Name")
     #parser.add_argument("--balance", type=str, default="balanced", help="the gender distribution in training data is skewed towards")
     #parser.add_argument("--anonymous", default=False, action='store_true', help="remove gender from candidate text")
@@ -91,7 +91,7 @@ def main():
         wandb_logger = None
     train_dataloader = DataLoader(train_samples, shuffle=True, batch_size=base_args.batch_size)
 
-    evaluator = CERerankingEvalUpdated(dev_samples, name='train-eval',lmbda=base_args.lmbda)
+    evaluator = CERerankingEvalUpdated(dev_samples, name='train-eval', lmbda=base_args.lmbda)
 
     logging.basicConfig(format='%(asctime)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S',
@@ -108,14 +108,14 @@ def main():
             epochs=base_args.num_epochs,
             warmup_steps=base_args.warmup_steps,
             output_path=model_save_path,
-            save_best_model= False,
+            save_best_model= "loss",
+            optimizer_params={'lr': 1e-5},
             debias=base_args.debias, #remove this if using orininal sentence-transformer libaray
             lmbda=base_args.lmbda,
             use_amp=True,
             wandb_logger= wandb_logger
               )
     model.save(model_save_path)
-
     #Test latest model
     testing(path=model_save_path,
             gpu=base_args.gpu_id,

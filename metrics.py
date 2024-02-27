@@ -33,10 +33,11 @@ def get_gap(uk_jobs, bios_test,dicts):
     return abs(np.mean(np.array(male_ndcg))-np.mean(np.array(female_ndcg)))
 
 
-def get_counterfactual_gap(pth,bios_test,dicts,dicts_counter):
+def get_counterfactual_gap(pth,dicts,dicts_counter):
     with open(f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/uk_jobs.pkl', 'rb') as file:
-        dicts = pickle.load(file)
-    uk_jobs = pd.DataFrame(dicts).reset_index()
+        uk_jobs = pd.DataFrame(pickle.load(file)).reset_index()
+    with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_test.pkl', 'rb') as file:
+        bios_test = pd.DataFrame(pickle.load(file))
     uk_jobs = uk_jobs.drop('index', axis=1)
     ndcg = []
     ndcg_counter = []
@@ -64,19 +65,15 @@ def SDR(bios_test,dicts):
         female_item_ids = female_item_ids+list(female_df[female_df['scores']>sorted(female_df['scores'],reverse=True)[10]]['corpus_id'])
 
     output = (len(male_item_ids)+len(female_item_ids)-2*len(set(male_item_ids).intersection(female_item_ids)))/(len(male_item_ids)+len(female_item_ids)-len(set(male_item_ids).intersection(female_item_ids)))
-    #output = len(set(male_item_ids).intersection(female_item_ids))
     return output
 
 def LDR(pth,dicts,dicts_counter):
     with open( f'{pth}share/hel/datasets/jobiqo/talent.com/JobRec/unbalanced_test.pkl', 'rb') as file:
-        dicts = pickle.load(file)
-    bios_test = pd.DataFrame(dicts)
+        bios_test = pd.DataFrame(pickle.load(file))
     output = []
     
     for i in range(len(bios_test)):
         output.append((sum(((dicts[i]['corpus_id']!=dicts_counter[i]['corpus_id'])*1)[:10]))/10)
-        #print(((dicts[i]['corpus_id']!=dicts_counter[i]['corpus_id'])*1)[:10])
-        #break
            
     if len(output)>0:
         ldr =sum(output)/len(output)
